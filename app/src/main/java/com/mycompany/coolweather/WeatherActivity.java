@@ -34,6 +34,9 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
+import static com.mycompany.coolweather.ChooseAreaFragment.SwipeFromWeatherActivityFlag;
+import static com.mycompany.coolweather.ChooseAreaFragment.SwipeFromWeatherId;
+
 public class WeatherActivity extends AppCompatActivity {
 
     public SwipeRefreshLayout swipeRefresh;
@@ -98,7 +101,7 @@ public class WeatherActivity extends AppCompatActivity {
             loadBingPic();
         }
 
-        String weatherString = prefs.getString("weather",null);
+        String weatherString = prefs.getString("weather",null);   //将weather缓存获取实例weatherString
         final String weatherId;
         if(weatherString != null){
             //有缓存时直接解析天气数据
@@ -114,7 +117,16 @@ public class WeatherActivity extends AppCompatActivity {
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                requestWeather(weatherId);
+             //   if (SwipeFromWeatherActivityFlag == 0){
+                SharedPreferences swipeprefs = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this);
+                String weatherString = swipeprefs.getString("weather",null);
+                Weather weather = Utility.handleWeatherResponse(weatherString);
+                final String weatherid;
+                weatherid = weather.basic.weatherId;
+                requestWeather(weatherid);//}    //如果是第一次打开程序，则使用缓存的天气id
+             //   else {
+             //       requestWeather(SwipeFromWeatherId);   //如果是从滑动菜单选择的，就刷新从滑动菜单选择的天气id
+             //   }
             }
         });
     }
@@ -127,12 +139,13 @@ public class WeatherActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                final String responseText = response.body().string();
-                final Weather weather = Utility.handleWeatherResponse(responseText);
+                final String responseText = response.body().string();                  //获得原始数据
+                final Weather weather = Utility.handleWeatherResponse(responseText);   //解析数据
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (weather != null && "ok".equals(weather.status)){
+                        if (weather != null && "ok".equals(weather.status)){   //判断请求天气是否成功
+                            //将数据缓存到SharedPreferences中
                             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
                             editor.putString("weather",responseText);
                             editor.apply();

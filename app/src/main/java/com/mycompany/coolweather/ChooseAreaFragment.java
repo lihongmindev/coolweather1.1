@@ -37,6 +37,8 @@ public class ChooseAreaFragment extends Fragment {
     public static final int LEVEL_PROVINCE = 0;
     public static final int LEVEL_CITY = 1;
     public static final int LEVEL_COUNTY = 2;
+    public static int SwipeFromWeatherActivityFlag = 0;
+    public static String SwipeFromWeatherId;
 
     private ProgressDialog progressDialog;
     private TextView titleText;
@@ -101,6 +103,8 @@ public class ChooseAreaFragment extends Fragment {
                         startActivity(intent);
                         getActivity().finish();
                     }else if (getActivity() instanceof WeatherActivity){
+                        SwipeFromWeatherActivityFlag = 1;    //如果从华东菜单中选择了县，则代表不是第一次选择县了
+                        SwipeFromWeatherId = weatherId;      //可以让天气id记住每次从滑动菜单中选择县的天气id
                         WeatherActivity activity = (WeatherActivity) getActivity();
                         activity.drawerLayout.closeDrawers();
                         activity.swipeRefresh.setRefreshing(true);

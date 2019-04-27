@@ -17,6 +17,7 @@
         android:id="@+id/title_city"
         android:layout_centerInParent="true"
         android:textColor="#ccc"
+        android:background="#8000"
         android:textSize="20sp"/>
     <TextView
         android:layout_width="wrap_content"
